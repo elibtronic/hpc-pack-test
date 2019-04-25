@@ -33,9 +33,12 @@ MUT_TREE_MAX = 2
 # fn,a,b,n,P.x,P.y,Q.x,Q.y
 #TC = [16077749,87,30,16072891,8947224,7340826,15387666,13125775]
 #Yes this is ugly
-TC = open(sys.argv[2],"r").readline().split(",")
-TC = [int(i) for i in TC]
-
+try:
+	TC = open(sys.argv[2],"r").readline().split(",")
+	TC = [int(i) for i in TC]
+except:
+	print("No Curve File Specified")
+	sys.exit()
 
 
 ## Log / Seed Parameters
@@ -44,6 +47,9 @@ ORIGINAL_FILE = "./data_prep/"+str(TC[0])+"_original_seed_"
 
 POINTS_FILE_X = "./data_prep/"+str(TC[0])+"_x_points_seed_"
 POINTS_FILE_Y = "./data_prep/"+str(TC[0])+"_y_points_seed_"
+
+LONGRUN_FILE = "./data_prep/"+str(TC[0])+"_long_runs.txt"
+
 MUL_A_FILE = "./data_prep/"+str(TC[0])+"_a_mul_seed_"
 MUL_B_FILE = "./data_prep/"+str(TC[0])+"_b_mul_seed_"
 
@@ -76,6 +82,8 @@ PEN_THRESH = 17
 #FORCE_PARTITION_FUNCTION = "(P.x)"
 FORCE_PARTITION_FUNCTION =  'operator.mul(operator.add(P.y, 3), operator.mul(1, P.y))'
 
+# Maximum multiple to consider for Random Point Generation
+MAXPOINTRANGE = 1000000
 
 
 #Rho mul and inits, cprime and dprime as set to interval
@@ -1059,7 +1067,7 @@ class ECCurve:
 		"""
 		
 		while True:
-			mul_scale = randint(0,5000)
+			mul_scale = randint(0,MAXPOINTRANGE)
 			if mul_scale != 1000:
 				break
 		
@@ -1131,6 +1139,19 @@ def build_above():
 ### ECCurve object is closed
 ### These are helper functions to prep/test curve info
 ###
+def generate_long_runs():
+	"""
+	Will randomly generate rho runs and count of many iterations they take
+	"""
+	for run in range(0,2):
+		seed = randint(0,100000)
+		i,s = rho_set_seed(seed)
+		longrunf = open(LONGRUN_FILE,"a")
+		longrunf.write(i,s)
+		longrunf.close()
+		
+	return True
+		
 def rho_set_seed(seed):
 	"""
 	Used for either settling on a seed or to generate multiple original runs
@@ -1162,8 +1183,11 @@ def rho_set_seed(seed):
 	
 	#print(eC.init_a)
 	#print(eC.init_b)
+	
 	print(str(eC.rho_iters)+","+str(seed))
-
+	return(str(eC.rho_iters),str(seed))
+	
+	
 def rho_gp_with_params():
 	"""
 	Runs a to completion GP RHO using what is in curve_parameters.py
@@ -1554,7 +1578,8 @@ if __name__ == "__main__":
 	c - display cache
 	f - fitness snapshot GP style
 	g - fitness snapshot GA style
-
+	l - generate some long runs
+	
 	p - write out mutipliers/points based on UBER_SEED
 	q - find value of point Q
 	r - rho original, via GP to file, using UBER_SEED
@@ -1584,6 +1609,8 @@ if __name__ == "__main__":
 		rho_gp_with_params()
 	elif sys.argv[1] == 't':
 		rho_ga_with_params()
+	elif sys.argv[1] == 'l':
+		generate_long_runs()
 	else:
 		rho_set_seed(sys.argv[1])
 
