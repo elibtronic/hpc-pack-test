@@ -1143,8 +1143,8 @@ def generate_long_runs():
 	"""
 	Will randomly generate rho runs and count of many iterations they take
 	"""
-	for run in range(0,2):
-		seed = randint(0,100000)
+	for run in range(0,60):
+		seed = randint(0,5000)
 		i,s = rho_set_seed(seed)
 		longrunf = open(LONGRUN_FILE,"a")
 		longrunf.write(i,s)
@@ -1453,7 +1453,9 @@ def calculate_Q():
 	"""
 	eC = ECCurve(TC[0],TC[1],TC[2])
 	P = eC.create_point(TC[4],TC[5])
-	print(eC.mul(P,1000))
+	Q = eC.mul(P,1000)
+
+	print(str(P.x)+","+str(P.y)+","+str(Q.x)+","+str(Q.y))
 	return
 
 def calculate_Q_partition():
