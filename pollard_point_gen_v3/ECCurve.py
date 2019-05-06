@@ -65,7 +65,7 @@ GP_EVO_CACHE_BASE = "gp_evo_cache.txt"
 CURVE_DEBUG = True
 RHO_DEBUG = False
 FIT_DEBUG = False
-UBER_SEED = 23232
+#UBER_SEED = 23232
 
 GP_SHOW_EVOL = False
 GA_SHOW_EVOL = False
@@ -1145,18 +1145,31 @@ def generate_long_runs():
 	"""
 	for run in range(0,60):
 		seed = randint(0,5000)
+		print(seed)
 		i,s = rho_set_seed(seed)
 		longrunf = open(LONGRUN_FILE,"a")
-		longrunf.write(i,s)
+		longrunf.write(str(i)+","+str(s)+"\n")
 		longrunf.close()
 		
 	return True
-		
+
+def long_run():
+	"""
+	Will randomly generate rho runs and count of many iterations they take, seed from command line
+	"""
+	seed = sys.argv[1]
+	random.seed(seed)
+	i,s = rho_set_seed(seed)
+	longrunf = open(LONGRUN_FILE,"a")
+	longrunf.write(str(i)+","+str(s)+"\n")
+	longrunf.close()	
+	return True
+	
 def rho_set_seed(seed):
 	"""
 	Used for either settling on a seed or to generate multiple original runs
 	"""
-	random.seed(seed)
+	#random.seed(seed)
 	#print("Exploring..."+str(TC[0])+", s "+str(seed)+", l "+str(PARTITIONS)+",",end= " ")
 
 	eC = ECCurve(TC[0],TC[1],TC[2])
@@ -1172,6 +1185,10 @@ def rho_set_seed(seed):
 
 	for a in range(0,PARTITIONS):
 		eC.init_b.append(randint(0,int(TC[3])))
+
+	#print(seed)
+	#print(eC.init_a)
+	#print(eC.init_b)
 		
 	eC.P = eC.create_point(TC[4],TC[5])
 	eC.Q = eC.create_point(TC[6],TC[7])
@@ -1180,10 +1197,7 @@ def rho_set_seed(seed):
 	eC.partition_fn = "(P.x)"
 	
 	k = eC.rho(prime_order,True)
-	
-	#print(eC.init_a)
-	#print(eC.init_b)
-	
+		
 	print(str(eC.rho_iters)+","+str(seed))
 	return(str(eC.rho_iters),str(seed))
 	
@@ -1612,7 +1626,7 @@ if __name__ == "__main__":
 	elif sys.argv[1] == 't':
 		rho_ga_with_params()
 	elif sys.argv[1] == 'l':
-		generate_long_runs()
+		long_run()
 	else:
 		rho_set_seed(sys.argv[1])
 
