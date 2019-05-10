@@ -1157,7 +1157,8 @@ def long_run():
 	"""
 	Will randomly generate rho runs and count of many iterations they take, seed from command line
 	"""
-	seed = sys.argv[1]
+	seed = sys.argv[3]
+	print(seed)
 	random.seed(seed)
 	i,s = rho_set_seed(seed)
 	longrunf = open(LONGRUN_FILE,"a")
